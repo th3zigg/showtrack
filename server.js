@@ -69,6 +69,13 @@ var _ = require('lodash');
 
 var app = express();
 
+app.set('port', process.env.PORT || 3000);
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/api/shows', function(req, res, next) {
 	var query = Show.find();
 	if (req.query.genre) {
@@ -92,7 +99,7 @@ app.get('/api/shows:id', function(req, res, next) {
 });
 
 app.post('/api/shows', function(req, res, next) {
-  var apiKey = '9EF1D1E7D28FDA0B';
+  var apiKey = '0833B087A16C0C86';
   var parser = xml2js.Parser({
     explicitArray: false,
     normalizeTags: true
@@ -181,13 +188,6 @@ app.use(function(err, req, res, next) {
   console.error(err.stack);
   res.send(500, { message: err.message });
 });
-
-app.set('port', process.env.PORT || 3000);
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(app.get('port'), function() {
 	console.log('Express server listening on port ' + app.get('port'));
