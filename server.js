@@ -77,10 +77,6 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat' }));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
 
 passport.serializeUser(function(user, done) {
 	done(null, user.id);
@@ -105,12 +101,10 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, function(email, passw
 	});
 }));
 
-app.use(function(req, res, next) {
-	if (req.user) {
-		res.cookie('user', JSON.stringify(req.user));
-	}
-	next();
-});
+app.use(session({ secret: 'keyboard cat' }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
 
 function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) next();
@@ -132,7 +126,7 @@ app.get('/api/shows', function(req, res, next) {
 	});
 });
 
-app.get('/api/shows:id', function(req, res, next) {
+app.get('/api/shows/:id', function(req, res, next) {
 	Show.findById(req.params.id, function(err, show) {
 		if (err) return next(err);
 		res.send(show);
@@ -238,6 +232,13 @@ app.post('/api/signup', function(req, res, next) {
 app.get('/api/logout', function(req, res, next) {
 	req.logout();
 	res.send(200);
+});
+
+app.use(function(req, res, next) {
+	if (req.user) {
+		res.cookie('user', JSON.stringify(req.user));
+	}
+	next();
 });
 
 app.post('/api/subscribe', ensureAuthenticated, function(req, res, next) {
